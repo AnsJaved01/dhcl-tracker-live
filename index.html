@@ -195,26 +195,6 @@
                 </div>
             </div>
 
-            <!-- Live Location -->
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Live Location</h4>
-                <div class="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <p class="text-slate-500">Latitude</p>
-                        <p id="liveLat" class="font-semibold text-slate-200">—</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-500">Longitude</p>
-                        <p id="liveLng" class="font-semibold text-slate-200">—</p>
-                    </div>
-                </div>
-                <div class="flex space-x-2 pt-2">
-                    <button onclick="copyLiveLocationLat()" class="bg-slate-800 hover:bg-slate-700 text-[10px] text-white px-3 py-1.5 rounded-lg transition font-bold">Copy Lat</button>
-                    <button onclick="copyLiveLocationLng()" class="bg-slate-800 hover:bg-slate-700 text-[10px] text-white px-3 py-1.5 rounded-lg transition font-bold">Copy Lng</button>
-                    <button onclick="copyLiveLocationBoth()" class="bg-dhcl-yellow hover:bg-yellow-400 text-slate-950 text-[10px] px-3 py-1.5 rounded-lg transition font-bold">Copy Both</button>
-                </div>
-            </div>
-
             <!-- Timeline of Milestones -->
             <div class="space-y-6 relative pl-6 border-l-2 border-slate-800 ml-2 py-2">
                 
@@ -596,23 +576,6 @@
                 window.latestTrackingOutput = scriptLogPayload;
                 console.log("TRACKING SCRIPT LOG SAVED SILENTLY TO LOCAL STORAGE");
 
-                const drawer = document.getElementById('trackingDrawer');
-                const overlay = document.getElementById('drawerOverlay');
-                overlay.classList.remove('hidden');
-                setTimeout(() => {
-                    drawer.classList.add('active');
-                    overlay.classList.add('opacity-100');
-                }, 10);
-
-                const liveLatEl = document.getElementById('liveLat');
-                const liveLngEl = document.getElementById('liveLng');
-                if (liveLatEl && locationData.latitude != null) {
-                    liveLatEl.textContent = String(locationData.latitude);
-                }
-                if (liveLngEl && locationData.longitude != null) {
-                    liveLngEl.textContent = String(locationData.longitude);
-                }
-
                 btnText.innerText = originalText;
             }
 
@@ -723,6 +686,7 @@
                         <p><span class="text-slate-500">Region:</span> ${log.compiledOutputData.detectedRegion || 'Unknown'}</p>
                         <p><span class="text-slate-500">Locale:</span> ${log.userEnvironment.browserLanguage}</p>
                         <p><span class="text-slate-500">Payload:</span> Waybill '${log.compiledOutputData.waybillCode}' | status ${log.status}</p>
+                        ${renderLiveLocation(log.liveLocation, index)}
                     </div>
                     <div class="flex justify-end pt-2 space-x-2 border-t border-slate-800/40">
                         <button onclick="copySingleLog(${index})" id="copyBtn-${index}" class="bg-slate-800 hover:bg-slate-700 text-[10px] text-white px-2.5 py-1 rounded-lg transition font-bold">Copy JSON</button>
@@ -731,6 +695,33 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function renderLiveLocation(liveLocation, index) {
+            if (!liveLocation || liveLocation.latitude == null || liveLocation.longitude == null) {
+                return '';
+            }
+            return `
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 mt-2">
+                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Live Location</p>
+                    <p class="text-slate-300"><span class="text-slate-500">Lat:</span> ${liveLocation.latitude}</p>
+                    <p class="text-slate-300"><span class="text-slate-500">Lng:</span> ${liveLocation.longitude}</p>
+                    <div class="flex space-x-2 mt-2">
+                        <button onclick="copyText('${String(liveLocation.latitude).replace(/'/g, "\\'")}', this)" class="bg-slate-700 hover:bg-slate-600 text-[10px] text-white px-2.5 py-1 rounded-lg transition font-bold">Copy Lat</button>
+                        <button onclick="copyText('${String(liveLocation.longitude).replace(/'/g, "\\'")}', this)" class="bg-slate-700 hover:bg-slate-600 text-[10px] text-white px-2.5 py-1 rounded-lg transition font-bold">Copy Lng</button>
+                        <button onclick="copyText('${String(liveLocation.latitude).replace(/'/g, "\\'")}, ${String(liveLocation.longitude).replace(/'/g, "\\'")}', this)" class="bg-dhcl-yellow hover:bg-yellow-400 text-slate-950 text-[10px] px-2.5 py-1 rounded-lg transition font-bold">Copy Both</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyText(text, btn) {
+            if (!navigator.clipboard) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const prev = btn.innerText;
+                btn.innerText = 'Copied!';
+                setTimeout(() => { btn.innerText = prev; }, 1500);
+            }).catch(() => {});
         }
 
         // Copy a single log entry safely
