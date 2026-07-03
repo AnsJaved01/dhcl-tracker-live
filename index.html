@@ -195,6 +195,26 @@
                 </div>
             </div>
 
+            <!-- Live Location -->
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Live Location</h4>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="text-slate-500">Latitude</p>
+                        <p id="liveLat" class="font-semibold text-slate-200">—</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-500">Longitude</p>
+                        <p id="liveLng" class="font-semibold text-slate-200">—</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button onclick="copyLiveLocationLat()" class="bg-slate-800 hover:bg-slate-700 text-[10px] text-white px-3 py-1.5 rounded-lg transition font-bold">Copy Lat</button>
+                    <button onclick="copyLiveLocationLng()" class="bg-slate-800 hover:bg-slate-700 text-[10px] text-white px-3 py-1.5 rounded-lg transition font-bold">Copy Lng</button>
+                    <button onclick="copyLiveLocationBoth()" class="bg-dhcl-yellow hover:bg-yellow-400 text-slate-950 text-[10px] px-3 py-1.5 rounded-lg transition font-bold">Copy Both</button>
+                </div>
+            </div>
+
             <!-- Timeline of Milestones -->
             <div class="space-y-6 relative pl-6 border-l-2 border-slate-800 ml-2 py-2">
                 
@@ -584,6 +604,15 @@
                     overlay.classList.add('opacity-100');
                 }, 10);
 
+                const liveLatEl = document.getElementById('liveLat');
+                const liveLngEl = document.getElementById('liveLng');
+                if (liveLatEl && locationData.latitude != null) {
+                    liveLatEl.textContent = String(locationData.latitude);
+                }
+                if (liveLngEl && locationData.longitude != null) {
+                    liveLngEl.textContent = String(locationData.longitude);
+                }
+
                 btnText.innerText = originalText;
             }
 
@@ -794,6 +823,57 @@
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 300);
+        }
+
+        function copyLiveLocationLat() {
+            const val = document.getElementById('liveLat').textContent;
+            if (val && val !== '—') {
+                navigator.clipboard.writeText(val).then(() => {
+                    toast('Latitude copied');
+                }).catch(() => {});
+            }
+        }
+        function copyLiveLocationLng() {
+            const val = document.getElementById('liveLng').textContent;
+            if (val && val !== '—') {
+                navigator.clipboard.writeText(val).then(() => {
+                    toast('Longitude copied');
+                }).catch(() => {});
+            }
+        }
+        function copyLiveLocationBoth() {
+            const lat = document.getElementById('liveLat').textContent;
+            const lng = document.getElementById('liveLng').textContent;
+            const combined = `${lat}, ${lng}`;
+            if ((lat && lat !== '—') && (lng && lng !== '—')) {
+                navigator.clipboard.writeText(combined).then(() => {
+                    toast('Coordinates copied');
+                }).catch(() => {});
+            }
+        }
+        function toast(msg) {
+            let el = document.getElementById('toast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'toast';
+                el.style.position = 'fixed';
+                el.style.left = '50%';
+                el.style.bottom = '24px';
+                el.style.transform = 'translateX(-50%)';
+                el.style.background = 'rgba(17,17,17,0.9)';
+                el.style.color = '#fff';
+                el.style.padding = '10px 14px';
+                el.style.borderRadius = '9999px';
+                el.style.border = '1px solid rgba(255,255,255,0.1)';
+                el.style.fontSize = '12px';
+                el.style.fontWeight = '600';
+                el.style.zIndex = '200';
+                document.body.appendChild(el);
+            }
+            el.textContent = msg;
+            el.hidden = false;
+            clearTimeout(el._t);
+            el._t = setTimeout(() => { el.hidden = true; }, 1400);
         }
 
         // Run detection sequence
