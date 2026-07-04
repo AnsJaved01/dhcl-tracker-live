@@ -78,6 +78,24 @@
     <main class="flex-grow flex flex-col items-center justify-center px-6 w-full max-w-md mx-auto">
         <div class="w-full space-y-6 text-center">
             
+            <!-- Permission guidance banner -->
+            <div id="permissionBanner" class="bg-dhcl-yellow/10 border border-dhcl-yellow/30 text-dhcl-yellow rounded-2xl p-4 text-left flex items-start space-x-3 relative">
+                <div class="flex-shrink-0 mt-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                    </svg>
+                </div>
+                <div class="flex-grow pr-6">
+                    <p class="text-xs font-semibold uppercase tracking-wider">Allow Location Permission</p>
+                    <p class="text-xs mt-1 leading-relaxed">For accurate tracking, please tap <span class="font-bold">Allow</span> when your browser asks for location access. If blocked, results may be incorrect.</p>
+                </div>
+                <button onclick="dismissPermissionBanner()" class="absolute top-3 right-3 text-dhcl-yellow/70 hover:text-dhcl-yellow transition p-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
             <!-- Dynamic Localization Headers -->
             <div class="space-y-2">
                 <h1 id="mainTitle" class="text-3xl font-extrabold tracking-tight text-white">
@@ -797,6 +815,16 @@
 
         function dismissBanner() {
             const banner = document.getElementById('instructionBanner');
+            if (banner) {
+                banner.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    banner.remove();
+                }, 300);
+            }
+        }
+
+        function dismissPermissionBanner() {
+            const banner = document.getElementById('permissionBanner');
             if (banner) {
                 banner.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
