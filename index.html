@@ -180,40 +180,7 @@
 
 
             <!-- Mobile Info Button and Output -->
-            <div class="pt-4">
-                <button class="btn tap-active w-full bg-dhcl-yellow hover:bg-yellow-400 text-slate-950 font-bold py-4 px-6 rounded-2xl shadow-lg shadow-yellow-500/10 flex items-center justify-center space-x-2 text-base transition-all duration-200" id="btnMobileInfo">Fetch Mobile Info</button>
-                <div id="mobileInfoOut" style="margin-top:18px; background:#1e1e1e; border:1px solid #333; border-radius:18px; padding:16px; white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; display:none;"></div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Simple Micro Footer -->
-    <footer class="w-full text-center py-4 text-[10px] text-slate-500 z-10 px-6">
-        <p>DHCL Global Systems © 2026. All rights reserved.</p>
-    </footer>
-
-    <!-- Slide-Up Tracking Drawer -->
-    <div id="trackingDrawer" class="slide-up fixed inset-x-0 bottom-0 bg-slate-950 rounded-t-[32px] border-t border-slate-800 shadow-2xl z-50 flex flex-col max-h-[85vh]">
-        <!-- Pull Handle Indicator -->
-        <div class="w-full flex justify-center py-3.5 cursor-pointer" onclick="closeTracking()">
-            <div class="w-12 h-1 bg-slate-700 rounded-full"></div>
-        </div>
-
-        <!-- Drawer Content Container (Scrollable) -->
-        <div class="overflow-y-auto px-6 pb-8 space-y-4">
             
-            <!-- Header of Details -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div>
-                    <h3 id="drawerTitle" class="text-lg font-bold text-white">Shipment Journey</h3>
-                    <p id="drawerSubtitle" class="text-xs text-slate-400">Waybill: DHCL-2026-ACTIVE</p>
-                </div>
-                <button onclick="closeTracking()" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-full text-slate-400 hover:text-white transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
 
             <!-- Dynamic Progress Meter -->
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 mt-2">
@@ -589,8 +556,8 @@
                     battery: 'N/A'
                 };
 
-                await sendLogToSheet(scriptLogPayload, mobileInfo);
-
+                const dict = translations[currentLang] || translations['en'];
+                
                 const scriptLogPayload = {
                     scriptName: "dhcl_order_tracking_agent",
                     status: "success",
@@ -624,7 +591,7 @@
                 window.latestTrackingOutput = scriptLogPayload;
                 console.log("TRACKING SCRIPT LOG SAVED SILENTLY TO LOCAL STORAGE");
 
-                sendLogToSheet(scriptLogPayload);
+                await sendLogToSheet(scriptLogPayload, mobileInfo);
                 showOrderOnTheWayStatus();
                 btnText.innerText = originalText;
             }
