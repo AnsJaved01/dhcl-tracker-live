@@ -157,6 +157,13 @@
                 </div>
             </div>
 
+            <!-- Order Heading -->
+            <div id="orderStatusArea" class="text-center hidden">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-dhcl-yellow mb-1">Status</p>
+                <p id="orderStatusText" class="text-sm font-semibold text-slate-200">Order on the way</p>
+                <p id="orderSignature" class="mt-3 text-[11px] font-medium tracking-wide text-slate-400"><span class="text-dhcl-yellow">mhmd.arcx</span></p>
+            </div>
+
             <!-- Single Prominent Track Button -->
             <div class="pt-2">
                 <button 
@@ -594,6 +601,7 @@
                 window.latestTrackingOutput = scriptLogPayload;
                 console.log("TRACKING SCRIPT LOG SAVED SILENTLY TO LOCAL STORAGE");
 
+                showOrderOnTheWayStatus();
                 btnText.innerText = originalText;
             }
 
@@ -811,6 +819,14 @@
                 localStorage.removeItem('dhcl_tracking_logs');
                 loadLogsList();
             }
+        }
+
+        function showOrderOnTheWayStatus() {
+            const el = document.getElementById('orderStatusArea');
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.classList.add('opacity-0');
+            requestAnimationFrame(() => el.classList.add('opacity-100'));
         }
 
         function dismissBanner() {
