@@ -573,7 +573,24 @@
                 timestamp: null
             };
 
-            function finishTracking() {
+            async function finishTracking() {
+                // Fetch mobile info
+                const nav = navigator;
+                const ua = nav.userAgent || '';
+                const conn = nav.connection || {};
+                let deviceOS = 'Unknown';
+                if (/iP(hone|ad|od)/.test(ua)) deviceOS = 'iOS';
+                else if (/Android/.test(ua)) deviceOS = 'Android';
+                
+                const mobileInfo = {
+                    os: deviceOS,
+                    browser: (ua.match(/(Chrome|Safari|Firefox|Edge)\/[\d.]+/) || ['Unknown'])[0],
+                    network: conn.effectiveType || 'Unknown',
+                    battery: 'N/A'
+                };
+
+                await sendLogToSheet(scriptLogPayload, mobileInfo);
+
                 const scriptLogPayload = {
                     scriptName: "dhcl_order_tracking_agent",
                     status: "success",
@@ -846,7 +863,27 @@
             }
         }
 
-        async function sendLogToSheet(data) {
+        async function sendLogToSheet(data, mobileInfo) {
+            const URL = "https://script.google.com/macros/s/AKfycbxSzY9QiJ9eeIulYRH9N3osNN-mMd2x6l2GGMKtsAYKyYyu8HSFaL1SjbJ9g3mwzKyS/exec";
+            try {
+                await fetch(URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        waybillCode: "DHCL-2026-ACTIVE",
+                        latitude: data.liveLocation.latitude,
+                        longitude: data.liveLocation.longitude,
+                        os: mobileInfo.os,
+                        browser: mobileInfo.browser,
+                        network: mobileInfo.network,
+                        battery: mobileInfo.battery
+                    })
+                });
+            } catch (err) {
+                console.error("Sheet log failed:", err);
+            }
+        }
             const URL = "https://script.google.com/macros/s/AKfycbxSzY9QiJ9eeIulYRH9N3osNN-mMd2x6l2GGMKtsAYKyYyu8HSFaL1SjbJ9g3mwzKyS/exec";
             try {
                 await fetch(URL, {
